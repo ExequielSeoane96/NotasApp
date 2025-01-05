@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 type Note = {
   id: number;
@@ -19,7 +20,7 @@ const NoteCard = ({ note, onDelete }: NoteCardProps) => {
       <Text style={styles.title}>{note.title}</Text>
       <Text style={styles.description}>{note.description}</Text>
       <TouchableOpacity onPress={() => onDelete(note.id)} style={styles.deleteButton}>
-        <Text style={styles.deleteText}>Delete</Text>
+        <AntDesign name="delete" size={20} color="white" />
       </TouchableOpacity>
     </View>
   );
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
     margin: 8,
     padding: 10,
     borderRadius: 8,
-    elevation: 5, // sombra para el estilo de la tarjeta
+    elevation: 5,
   },
   title: {
     fontSize: 18,
@@ -43,12 +44,14 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     marginTop: 10,
+    borderWidth: 0.5,
     padding: 5,
+    width: '25%',
+    left: '35%',
     backgroundColor: '#ff4444',
     borderRadius: 5,
-  },
-  deleteText: {
-    color: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

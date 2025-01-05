@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, FlatList, StyleSheet, Alert } from 'react-native';
-import NoteCard from './components/NoteCard';
+import { Alert, StyleSheet, View, Pressable } from 'react-native';
+import NoteList from './components/NoteList';
 import { saveNotes, loadNotes, deleteNote } from './utils/storage';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import NoteModal from './components/NoteModal';
 
-// Definir el tipo para las notas
 type Note = {
   id: number;
   title: string;
@@ -15,7 +16,8 @@ export default function App() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [color, setColor] = useState<string>('#ffeb3b'); // Color por defecto
+  const [color, setColor] = useState<string>('#ffeb3b');
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchNotes = async () => {
@@ -25,7 +27,7 @@ export default function App() {
     fetchNotes();
   }, []);
 
-  const handleAddNote = () => {
+  const addNote = () => {
     if (title && description) {
       const newNote: Note = {
         id: Date.now(),
@@ -38,6 +40,7 @@ export default function App() {
       saveNotes(updatedNotes);
       setTitle('');
       setDescription('');
+      setModalVisible(false);
     } else {
       Alert.alert('Error', 'Both title and description are required');
     }
@@ -50,29 +53,26 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Title"
-        value={title}
-        onChangeText={setTitle}
+      {/* Button to open the modal */}
+      <Pressable style={styles.fab} onPress={() => setModalVisible(true)}>
+        <AntDesign name="pluscircle" size={40} color="white" />
+      </Pressable>
+
+      {/* Modal for adding new note */}
+      <NoteModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        title={title}
+        description={description}
+        color={color}
+        setTitle={setTitle}
+        setDescription={setDescription}
+        setColor={setColor}
+        addNote={addNote}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Description"
-        value={description}
-        onChangeText={setDescription}
-      />
-      <Button title="Add Note" onPress={handleAddNote} />
-      
-      <FlatList
-        data={notes}
-        renderItem={({ item }) => (
-          <NoteCard note={item} onDelete={handleDeleteNote} />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={2}
-        contentContainerStyle={styles.list}
-      />
+
+      {/* List of notes */}
+      <NoteList notes={notes} handleDeleteNote={handleDeleteNote} />
     </View>
   );
 }
@@ -84,16 +84,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#f7f7f7',
   },
-  input: {
-    height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-  list: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  fab: {
+    position: 'absolute',
+    top: '95%',
+    left: '53%',
+    transform: [{ translateX: -30 }, { translateY: -30 }],  // Ajusta el botón al centro
+    backgroundColor: '#007bff',
+    borderRadius: 50,
+    padding: 20,
+    elevation: 5,
+    zIndex: 999,  // Asegura que el botón esté sobre otros elementos
   },
 });
